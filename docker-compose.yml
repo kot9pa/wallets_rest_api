@@ -1,0 +1,57 @@
+services:
+  db_wallets:
+    image: postgres:latest
+    container_name: db_wallets
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d/
+
+  app_wallets:
+    image: app_wallets
+    container_name: app_wallets
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+      - "8089:8089"
+    depends_on:
+      db_wallets:
+        condition: service_healthy
+    command: >
+      sh -c "uvicorn src.main:app --workers ${WORKERS} \
+      --host=${SERVER_HOST} --port=${SERVER_PORT} --log-level=${LOG_LEVEL}"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.com
+      PGADMIN_DEFAULT_PASSWORD: passwd
+      GLOBALLY_DELIVERABLE: False
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      db_wallets:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  pgadmin-data:

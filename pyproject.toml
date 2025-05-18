@@ -1,0 +1,48 @@
+[project]
+name = "wallets-rest-api"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "kot9pa",email = "kot9paa@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi (>=0.115.12,<0.116.0)",
+    "uvicorn (>=0.34.2,<0.35.0)",
+    "pydantic-settings (>=2.9.1,<3.0.0)",
+    "sqlalchemy (>=2.0.40,<3.0.0)",
+    "asyncpg (>=0.30.0,<0.31.0)",
+    "alembic (>=1.15.2,<2.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "pytest-asyncio (>=0.26.0,<0.27.0)",
+    "pytest-mock (>=3.14.0,<4.0.0)",
+    "locust (>=2.37.3,<3.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+
+[tool.poetry]
+package-mode = false
+
+[tool.autopep8]
+max_line_length = 120
+ignore = "E402"
+
+[tool.pytest.ini_options]
+log_cli = true
+pythonpath = ["src", "tests"]
+testpaths = ["tests"]
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+
+[tool.locust]
+locustfile = "tests/load_test/locustfile.py"
+only-summary = true
+loglevel = "WARNING"
